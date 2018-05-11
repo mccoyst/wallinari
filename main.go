@@ -5,6 +5,7 @@ package main
 import (
 	"image"
 	"image/color"
+	"image/color/palette"
 	"image/draw"
 	"image/png"
 	"os"
@@ -24,8 +25,10 @@ func main() {
 	}
 
 	out := image.NewNRGBA(image.Rect(0, 0, xw, xh))
+	u := image.NewUniform(color.White)
+	draw.Draw(out, out.Bounds(), u, image.ZP, draw.Src)
 
-	divideAndContour(out, panels)
+	divideAndContour(out, glenda)
 
 	file, err := os.Create("hot.png")
 	if err != nil {
@@ -59,4 +62,36 @@ func panels(m *image.NRGBA) {
 
 	u := image.NewUniform(c)
 	draw.Draw(m, m.Bounds(), u, image.ZP, draw.Src)
+}
+
+func dirt(m *image.NRGBA) {
+	bounds := m.Bounds()
+	dx, dy := bounds.Dx(), m.Bounds().Dy()
+	ndots :=  dx * dy / 16
+	for i := 0; i < ndots; i++ {
+		x := rand.Intn(dx)
+		y := rand.Intn(dy)
+		m.Set(bounds.Min.X + x, bounds.Min.Y + y, color.Black)
+		m.Set(bounds.Min.X + x - 1, bounds.Min.Y + y, color.Black)
+		m.Set(bounds.Min.X + x + 1, bounds.Min.Y + y, color.Black)
+		m.Set(bounds.Min.X + x, bounds.Min.Y + y - 1, color.Black)
+		m.Set(bounds.Min.X + x, bounds.Min.Y + y + 1, color.Black)
+	}
+}
+
+func kitchen(m *image.NRGBA) {
+	if rand.Intn(2) == 1 {
+		u := image.NewUniform(color.Black)
+		draw.Draw(m, m.Bounds(), u, image.ZP, draw.Src)
+	}
+}
+
+func glenda(m *image.NRGBA) {
+	c := palette.Plan9[rand.Intn(len(palette.Plan9))]
+	u := image.NewUniform(c)
+	draw.Draw(m, m.Bounds(), u, image.ZP, draw.Src)
+}
+
+func sticks(m *image.NRGBA) {
+	 // Bresenham
 }
