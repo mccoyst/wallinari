@@ -43,6 +43,8 @@ func main() {
 		divideAndContour(out, dirt)
 	case "panels":
 		divideAndContour(out, panels)
+	case "sticks":
+		divideAndContour(out, sticks)
 	default:
 		panic("no no no")
 	}
@@ -110,5 +112,15 @@ func glenda(m *image.NRGBA) {
 }
 
 func sticks(m *image.NRGBA) {
-	 // Bresenham
+	 // Bresenham… not
+	bounds := m.Bounds()
+	dx, dy := bounds.Dx(), m.Bounds().Dy()
+	x0, y0 := 8 + rand.Intn(dx), 8 + rand.Intn(dy)
+	xF, yF := bounds.Dx()-x0, bounds.Dy()-y0
+
+	for j := y0; j <= yF; j++ {
+	for i := x0; i <= xF; i++ {
+		m.Set(bounds.Min.X + i, bounds.Min.Y + j, color.Black)
+	}
+	}
 }
