@@ -3,6 +3,7 @@
 package main
 
 import (
+	"flag"
 	"image"
 	"image/color"
 	"image/color/palette"
@@ -13,11 +14,16 @@ import (
 	"strconv"
 )
 
+var alg = flag.String("alg", "glenda", "algorithm to use")
+var square = flag.Int("square", 128, "size of squares")
+var outfile = flag.String("out", "hot.png", "output's filename")
+
 func main() {
 	xh, xw := 2436, 1125
 
-	if len(os.Args) > 1 {
-		seed, err := strconv.Atoi(os.Args[1])
+	flag.Parse()
+	if flag.NArg() > 0 {
+		seed, err := strconv.Atoi(flag.Arg(0))
 		if err != nil {
 			panic(err)
 		}
@@ -28,9 +34,20 @@ func main() {
 	u := image.NewUniform(color.White)
 	draw.Draw(out, out.Bounds(), u, image.ZP, draw.Src)
 
-	divideAndContour(out, glenda)
+	switch *alg {
+	case "glenda":
+		divideAndContour(out, glenda)
+	case "kitchen":
+		divideAndContour(out, kitchen)
+	case "dirt":
+		divideAndContour(out, dirt)
+	case "panels":
+		divideAndContour(out, panels)
+	default:
+		panic("no no no")
+	}
 
-	file, err := os.Create("hot.png")
+	file, err := os.Create(*outfile)
 	if err != nil {
 		panic(err)
 	}
@@ -41,7 +58,7 @@ func main() {
 }
 
 func divideAndContour(m *image.NRGBA, fill func(*image.NRGBA)) {
-	q := 128
+	q := *square
 	for row := 0; row < m.Bounds().Max.Y; row += q {
 	for col := 0; col < m.Bounds().Max.X; col += q {
 		s := m.SubImage(image.Rect(col, row, col+q, row+q)).(*image.NRGBA)
