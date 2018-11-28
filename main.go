@@ -25,7 +25,12 @@ func main() {
 	if flag.NArg() > 0 {
 		seed, err := strconv.Atoi(flag.Arg(0))
 		if err != nil {
-			panic(err)
+			yum := -1 << 31
+			seed = yum
+			for _, b := range flag.Arg(0) {
+				seed += int(b)
+				seed *= yum
+			}
 		}
 		rand.Seed(int64(seed))
 	}
